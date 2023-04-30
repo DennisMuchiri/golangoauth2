@@ -7,6 +7,7 @@ type Client struct {
 	Domain string
 	Public bool
 	UserID string
+	RoleID string
 }
 
 // GetID client id
@@ -32,4 +33,9 @@ func (c *Client) IsPublic() bool {
 // GetUserID user id
 func (c *Client) GetUserID() string {
 	return c.UserID
+}
+
+// GetRoleID role id
+func (c *Client) GetRoleID() string {
+	return c.RoleID
 }

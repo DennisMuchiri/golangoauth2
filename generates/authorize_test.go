@@ -18,6 +18,7 @@ func TestAuthorize(t *testing.T) {
 			Client: &models.Client{
 				ID:     "123456",
 				Secret: "123456",
+				RoleID: "ADMIN",
 			},
 			UserID:   "000000",
 			CreateAt: time.Now(),
