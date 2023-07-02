@@ -508,14 +508,16 @@ func (s *Server) HandleTokenRequest(w http.ResponseWriter, r *http.Request) erro
 
 	gt, tgr, err := s.ValidationTokenRequest(r)
 	if err != nil {
+		fmt.Println("ValidationTokenRequest err")
 		return s.tokenError(w, err)
 	}
 
 	ti, err := s.GetAccessToken(ctx, gt, tgr)
 	if err != nil {
+		fmt.Println("GetAccessToken err")
 		return s.tokenError(w, err)
 	}
-
+	fmt.Println("GetAccessToken success")
 	return s.token(w, s.GetTokenData(ti), nil)
 }
 

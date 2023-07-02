@@ -118,6 +118,7 @@ func main() {
 
 		err := srv.HandleTokenRequest(w, r)
 		if err != nil {
+			fmt.Println("HandleTokenRequest err")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
