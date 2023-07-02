@@ -283,28 +283,38 @@ func (m *Manager) validateCodeChallenge(ti oauth2.TokenInfo, ver string) error {
 
 // GenerateAccessToken generate the access token
 func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
+	fmt.Print("GenerateAccessToken1 ClientID==" + tgr.ClientID)
 	cli, err := m.GetClient(ctx, tgr.ClientID)
 	if err != nil {
+		fmt.Print("GenerateAccessToken2 err==" + err.Error())
 		return nil, err
 	}
+	fmt.Print("GenerateAccessToken3")
+	fmt.Print("GenerateAccessToken3.1 ClientSecret==" + tgr.ClientSecret)
 	if cliPass, ok := cli.(oauth2.ClientPasswordVerifier); ok {
+		fmt.Print("GenerateAccessToken4 ok")
 		if !cliPass.VerifyPassword(tgr.ClientSecret) {
+			fmt.Print("GenerateAccessToken5 errors.ErrInvalidClient")
 			return nil, errors.ErrInvalidClient
 		}
 	} else if len(cli.GetSecret()) > 0 && tgr.ClientSecret != cli.GetSecret() {
+		fmt.Print("GenerateAccessToken6 len(cli.GetSecret()) > 0 ")
 		return nil, errors.ErrInvalidClient
 	}
 	if tgr.RedirectURI != "" {
+		fmt.Print("GenerateAccessToken7 tgr.RedirectURI != ")
 		if err := m.validateURI(cli.GetDomain(), tgr.RedirectURI); err != nil {
 			return nil, err
 		}
 	}
 
 	if gt == oauth2.ClientCredentials && cli.IsPublic() == true {
+		fmt.Print("GenerateAccessToken8 cli.IsPublic")
 		return nil, errors.ErrInvalidClient
 	}
 
 	if gt == oauth2.AuthorizationCode {
+		fmt.Print("GenerateAccessToken9 gt == oauth2.AuthorizationCode")
 		ti, err := m.getAndDelAuthorizationCode(ctx, tgr)
 		if err != nil {
 			return nil, err
@@ -318,7 +328,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 			tgr.AccessTokenExp = exp
 		}
 	}
-
+	fmt.Print("GenerateAccessToken10 ")
 	ti := models.NewToken()
 	ti.SetClientID(tgr.ClientID)
 	ti.SetUserID(tgr.UserID)
@@ -339,7 +349,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 		ti.SetRefreshCreateAt(createAt)
 		ti.SetRefreshExpiresIn(gcfg.RefreshTokenExp)
 	}
-
+	fmt.Print("GenerateAccessToken11 ")
 	td := &oauth2.GenerateBasic{
 		Client:    cli,
 		UserID:    tgr.UserID,
@@ -347,7 +357,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 		TokenInfo: ti,
 		Request:   tgr.Request,
 	}
-
+	fmt.Print("GenerateAccessToken12 ")
 	av, rv, err := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh)
 	if err != nil {
 		return nil, err
@@ -357,12 +367,12 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 	if rv != "" {
 		ti.SetRefresh(rv)
 	}
-
+	fmt.Print("GenerateAccessToken13 ")
 	err = m.tokenStore.Create(ctx, ti)
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Print("GenerateAccessToken14 ")
 	return ti, nil
 }
 
