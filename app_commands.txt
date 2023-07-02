@@ -1,2 +1,4 @@
 go install
 go get github.com/DennisMuchiri/ke-soundstream-oauth2
+go get github.com/DennisMuchiri/ke-soundstream-oauth2@none
+go clean -i -n  github.com/DennisMuchiri/ke-soundstream-oauth2

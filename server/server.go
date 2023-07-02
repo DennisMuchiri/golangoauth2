@@ -514,7 +514,7 @@ func (s *Server) HandleTokenRequest(w http.ResponseWriter, r *http.Request) erro
 
 	ti, err := s.GetAccessToken(ctx, gt, tgr)
 	if err != nil {
-		fmt.Println("GetAccessToken err")
+		fmt.Print("GetAccessToken err ==" + err.Error())
 		return s.tokenError(w, err)
 	}
 	fmt.Println("GetAccessToken success")
