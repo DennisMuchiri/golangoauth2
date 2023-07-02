@@ -420,7 +420,7 @@ func (s *Server) GetAccessToken(ctx context.Context, gt oauth2.GrantType, tgr *o
 		}
 		return ti, nil
 	case oauth2.PasswordCredentials, oauth2.ClientCredentials:
-		fmt.Println("GetAccessToken 5 !allowed ")
+		fmt.Println("GetAccessToken 5")
 		if fn := s.ClientScopeHandler; fn != nil {
 			allowed, err := fn(tgr)
 			if err != nil {

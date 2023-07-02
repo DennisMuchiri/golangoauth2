@@ -2,6 +2,7 @@ package manage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/DennisMuchiri/ke-soundstream-oauth2"
@@ -142,11 +143,14 @@ func (m *Manager) GetClient(ctx context.Context, clientID string) (cli oauth2.Cl
 
 // GenerateAuthToken generate the authorization token(code)
 func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
+	fmt.Print("GenerateAuthToken1 ClientID==" + tgr.ClientID)
 	cli, err := m.GetClient(ctx, tgr.ClientID)
 	if err != nil {
+		fmt.Print("GenerateAuthToken2 err==" + err.Error())
 		return nil, err
 	} else if tgr.RedirectURI != "" {
 		if err := m.validateURI(cli.GetDomain(), tgr.RedirectURI); err != nil {
+			fmt.Print("GenerateAuthToken3 err==" + err.Error())
 			return nil, err
 		}
 	}
