@@ -389,18 +389,14 @@ func (s *Server) CheckGrantType(gt oauth2.GrantType) bool {
 // GetAccessToken access token
 func (s *Server) GetAccessToken(ctx context.Context, gt oauth2.GrantType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo,
 	error) {
-	fmt.Println("GetAccessToken 1")
 	if allowed := s.CheckGrantType(gt); !allowed {
 		return nil, errors.ErrUnauthorizedClient
 	}
-	fmt.Println("GetAccessToken 2")
 	if fn := s.ClientAuthorizedHandler; fn != nil {
 		allowed, err := fn(tgr.ClientID, gt)
 		if err != nil {
-			fmt.Println("GetAccessToken 3 err==" + err.Error())
 			return nil, err
 		} else if !allowed {
-			fmt.Println("GetAccessToken 4 !allowed ")
 			return nil, errors.ErrUnauthorizedClient
 		}
 	}
@@ -420,18 +416,14 @@ func (s *Server) GetAccessToken(ctx context.Context, gt oauth2.GrantType, tgr *o
 		}
 		return ti, nil
 	case oauth2.PasswordCredentials, oauth2.ClientCredentials:
-		fmt.Println("GetAccessToken 5")
 		if fn := s.ClientScopeHandler; fn != nil {
 			allowed, err := fn(tgr)
 			if err != nil {
-				fmt.Println("GetAccessToken 6 err==" + err.Error())
 				return nil, err
 			} else if !allowed {
-				fmt.Println("GetAccessToken 7 !allowed")
 				return nil, errors.ErrInvalidScope
 			}
 		}
-		fmt.Println("GetAccessToken 8 GenerateAccessToken")
 		return s.Manager.GenerateAccessToken(ctx, gt, tgr)
 	case oauth2.Refreshing:
 		// check scope
@@ -515,16 +507,13 @@ func (s *Server) HandleTokenRequest(w http.ResponseWriter, r *http.Request) erro
 
 	gt, tgr, err := s.ValidationTokenRequest(r)
 	if err != nil {
-		fmt.Println("ValidationTokenRequest err")
 		return s.tokenError(w, err)
 	}
 
 	ti, err := s.GetAccessToken(ctx, gt, tgr)
 	if err != nil {
-		fmt.Print("GetAccessToken err ==" + err.Error())
 		return s.tokenError(w, err)
 	}
-	fmt.Println("GetAccessToken success")
 	return s.token(w, s.GetTokenData(ti), nil)
 }
 
