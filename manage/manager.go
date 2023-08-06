@@ -151,6 +151,11 @@ func (m *Manager) ReplaceAllClients(clients map[string]oauth2.ClientInfo, ctx co
 	return isReplaced, err
 }
 
+func (m *Manager) SetOneClient(key string, client oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	isReplaced, err := m.clientStore.SetOne(key, client, ctx)
+	return isReplaced, err
+}
+
 // GenerateAuthToken generate the authorization token(code)
 func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
 	cli, err := m.GetClient(ctx, tgr.ClientID)

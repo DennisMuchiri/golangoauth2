@@ -38,7 +38,6 @@ func (cs *ClientStore) GetAll(ctx context.Context) (map[string]oauth2.ClientInfo
 	defer cs.RUnlock()
 
 	c := cs.data
-
 	return c, nil
 }
 
@@ -48,6 +47,14 @@ func (cs *ClientStore) ReplaceAll(clients map[string]oauth2.ClientInfo, ctx cont
 	defer cs.RUnlock()
 
 	cs.data = clients
+	return true, nil
+}
+
+func (cs *ClientStore) SetOne(key string, cli oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	cs.Lock()
+	defer cs.Unlock()
+
+	cs.data[key] = cli
 	return true, nil
 }
 
