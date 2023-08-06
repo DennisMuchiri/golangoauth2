@@ -13,6 +13,9 @@ type (
 
 		// replace all current client information
 		ReplaceAll(clients map[string]ClientInfo, ctx context.Context) (bool, error)
+
+		// replace all current client information
+		SetOne(key string, client ClientInfo, ctx context.Context) (bool, error)
 	}
 
 	// TokenStore the token information storage interface

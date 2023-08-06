@@ -30,6 +30,9 @@ type Manager interface {
 	// get all clients information
 	GetAllClients(ctx context.Context) (map[string]ClientInfo, error)
 
+	// set one client information
+	SetOneClient(key string, client ClientInfo, ctx context.Context) (bool, error)
+
 	// replace all clients information
 	ReplaceAllClients(clients map[string]ClientInfo, ctx context.Context) (bool, error)
 
