@@ -27,6 +27,12 @@ type Manager interface {
 	// get the client information
 	GetClient(ctx context.Context, clientID string) (cli ClientInfo, err error)
 
+	// get all clients information
+	GetAllClients(ctx context.Context) (map[string]ClientInfo, error)
+
+	// replace all clients information
+	ReplaceAllClients(clients map[string]ClientInfo, ctx context.Context) (bool, error)
+
 	// generate the authorization token(code)
 	GenerateAuthToken(ctx context.Context, rt ResponseType, tgr *TokenGenerateRequest) (authToken TokenInfo, err error)
 

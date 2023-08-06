@@ -140,6 +140,17 @@ func (m *Manager) GetClient(ctx context.Context, clientID string) (cli oauth2.Cl
 	return
 }
 
+// GetAllClients get all clients information
+func (m *Manager) GetAllClients(ctx context.Context) (map[string]oauth2.ClientInfo, error) {
+	clients, err := m.clientStore.GetAll(ctx)
+	return clients, err
+}
+
+func (m *Manager) ReplaceAllClients(clients map[string]oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	isReplaced, err := m.clientStore.ReplaceAll(clients, ctx)
+	return isReplaced, err
+}
+
 // GenerateAuthToken generate the authorization token(code)
 func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
 	cli, err := m.GetClient(ctx, tgr.ClientID)
