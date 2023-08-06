@@ -38,6 +38,7 @@ func (cs *ClientStore) GetAll(ctx context.Context) (map[string]oauth2.ClientInfo
 	defer cs.RUnlock()
 
 	c := cs.data
+
 	return c, nil
 }
 
