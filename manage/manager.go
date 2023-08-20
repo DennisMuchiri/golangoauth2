@@ -157,7 +157,7 @@ func (m *Manager) SetOneClient(key string, client oauth2.ClientInfo, ctx context
 }
 
 // GenerateAuthToken generate the authorization token(code)
-func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
+func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest, gt *oauth2.GrantType) (oauth2.TokenInfo, error) {
 	cli, err := m.GetClient(ctx, tgr.ClientID)
 	if err != nil {
 		return nil, err
@@ -217,7 +217,7 @@ func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType,
 			ti.SetRefreshExpiresIn(icfg.RefreshTokenExp)
 		}
 
-		tv, rv, err := m.accessGenerate.Token(ctx, td, icfg.IsGenerateRefresh)
+		tv, rv, err := m.accessGenerate.Token(ctx, td, icfg.IsGenerateRefresh, gt)
 		if err != nil {
 			return nil, err
 		}
@@ -357,7 +357,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 		TokenInfo: ti,
 		Request:   tgr.Request,
 	}
-	av, rv, err := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh)
+	av, rv, err := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh, &gt)
 	if err != nil {
 		return nil, err
 	}
@@ -374,7 +374,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 }
 
 // RefreshAccessToken refreshing an access token
-func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
+func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGenerateRequest, gt *oauth2.GrantType) (oauth2.TokenInfo, error) {
 	ti, err := m.LoadRefreshToken(ctx, tgr.Refresh)
 	if err != nil {
 		return nil, err
@@ -417,7 +417,7 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 		ti.SetScope(scope)
 	}
 
-	tv, rv, err := m.accessGenerate.Token(ctx, td, rcfg.IsGenerateRefresh)
+	tv, rv, err := m.accessGenerate.Token(ctx, td, rcfg.IsGenerateRefresh, gt)
 	if err != nil {
 		return nil, err
 	}
