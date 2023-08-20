@@ -248,7 +248,7 @@ func (s *Server) GetAuthorizeToken(ctx context.Context, req *AuthorizeRequest) (
 	tgr.CodeChallenge = req.CodeChallenge
 	tgr.CodeChallengeMethod = req.CodeChallengeMethod
 
-	return s.Manager.GenerateAuthToken(ctx, req.ResponseType, tgr)
+	return s.Manager.GenerateAuthToken(ctx, req.ResponseType, tgr, nil)
 }
 
 // GetAuthorizeData get authorization response data
@@ -460,7 +460,7 @@ func (s *Server) GetAccessToken(ctx context.Context, gt oauth2.GrantType, tgr *o
 			}
 		}
 
-		ti, err := s.Manager.RefreshAccessToken(ctx, tgr)
+		ti, err := s.Manager.RefreshAccessToken(ctx, tgr, &gt)
 		if err != nil {
 			if err == errors.ErrInvalidRefreshToken || err == errors.ErrExpiredRefreshToken {
 				return nil, errors.ErrInvalidGrant
