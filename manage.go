@@ -36,8 +36,8 @@ type Manager interface {
 	// replace all clients information
 	ReplaceAllClients(clients map[string]ClientInfo, ctx context.Context) (bool, error)
 
-	// generate the authorization token(code)
-	GenerateAuthToken(ctx context.Context, rt ResponseType, tgr *TokenGenerateRequest) (authToken TokenInfo, err error)
+	// generate the authorization token(code)8
+	GenerateAuthToken(ctx context.Context, rt ResponseType, tgr *TokenGenerateRequest, gt *GrantType) (authToken TokenInfo, err error)
 
 	// generate the access token
 	GenerateAccessToken(ctx context.Context, gt GrantType, tgr *TokenGenerateRequest) (accessToken TokenInfo, err error)
