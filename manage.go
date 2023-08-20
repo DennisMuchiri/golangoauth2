@@ -43,7 +43,7 @@ type Manager interface {
 	GenerateAccessToken(ctx context.Context, gt GrantType, tgr *TokenGenerateRequest) (accessToken TokenInfo, err error)
 
 	// refreshing an access token
-	RefreshAccessToken(ctx context.Context, tgr *TokenGenerateRequest) (accessToken TokenInfo, err error)
+	RefreshAccessToken(ctx context.Context, tgr *TokenGenerateRequest, gt *GrantType) (accessToken TokenInfo, err error)
 
 	// use the access token to delete the token information
 	RemoveAccessToken(ctx context.Context, access string) (err error)
