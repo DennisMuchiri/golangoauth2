@@ -489,6 +489,14 @@ func (s *Server) GetTokenData(ti oauth2.TokenInfo) map[string]interface{} {
 		data["refresh_token"] = refresh
 	}
 
+	if userId := ti.GetUserID(); userId != "" {
+		data["user_id"] = userId
+	}
+
+	if clientId := ti.GetClientID(); clientId != "" {
+		data["client_id"] = clientId
+	}
+
 	if fn := s.ExtensionFieldsHandler; fn != nil {
 		ext := fn(ti)
 		for k, v := range ext {
