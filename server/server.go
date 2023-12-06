@@ -497,6 +497,10 @@ func (s *Server) GetTokenData(ti oauth2.TokenInfo) map[string]interface{} {
 		data["client_id"] = clientId
 	}
 
+	if jti := ti.GetIdJTI(); jti != "" {
+		data["jti"] = jti
+	}
+
 	if fn := s.ExtensionFieldsHandler; fn != nil {
 		ext := fn(ti)
 		for k, v := range ext {
