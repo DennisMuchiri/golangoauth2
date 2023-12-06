@@ -21,7 +21,7 @@ type AccessGenerate struct {
 }
 
 // Token based on the UUID generated token
-func (ag *AccessGenerate) Token(ctx context.Context, data *oauth2.GenerateBasic, isGenRefresh bool, gt *oauth2.GrantType) (string, string, error) {
+func (ag *AccessGenerate) Token(ctx context.Context, data *oauth2.GenerateBasic, isGenRefresh bool, gt *oauth2.GrantType) (string, string, error, string) {
 	buf := bytes.NewBufferString(data.Client.GetID())
 	buf.WriteString(data.UserID)
 	buf.WriteString(strconv.FormatInt(data.CreateAt.UnixNano(), 10))
@@ -34,5 +34,5 @@ func (ag *AccessGenerate) Token(ctx context.Context, data *oauth2.GenerateBasic,
 		refresh = strings.ToUpper(strings.TrimRight(refresh, "="))
 	}
 
-	return access, refresh, nil
+	return access, refresh, nil, ""
 }
