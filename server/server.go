@@ -40,22 +40,23 @@ func NewServer(cfg *Config, manager oauth2.Manager) *Server {
 
 // Server Provide authorization server
 type Server struct {
-	Config                       *Config
-	Manager                      oauth2.Manager
-	ClientInfoHandler            ClientInfoHandler
-	ClientAuthorizedHandler      ClientAuthorizedHandler
-	ClientScopeHandler           ClientScopeHandler
-	UserAuthorizationHandler     UserAuthorizationHandler
-	PasswordAuthorizationHandler PasswordAuthorizationHandler
-	RefreshingValidationHandler  RefreshingValidationHandler
-	PreRedirectErrorHandler      PreRedirectErrorHandler
-	RefreshingScopeHandler       RefreshingScopeHandler
-	ResponseErrorHandler         ResponseErrorHandler
-	InternalErrorHandler         InternalErrorHandler
-	ExtensionFieldsHandler       ExtensionFieldsHandler
-	AccessTokenExpHandler        AccessTokenExpHandler
-	AuthorizeScopeHandler        AuthorizeScopeHandler
-	ResponseTokenHandler         ResponseTokenHandler
+	Config                               *Config
+	Manager                              oauth2.Manager
+	ClientInfoHandler                    ClientInfoHandler
+	ClientAuthorizedHandler              ClientAuthorizedHandler
+	ClientScopeHandler                   ClientScopeHandler
+	UserAuthorizationHandler             UserAuthorizationHandler
+	PasswordAuthorizationHandler         PasswordAuthorizationHandler
+	RefreshingValidationHandler          RefreshingValidationHandler
+	PreRedirectErrorHandler              PreRedirectErrorHandler
+	RefreshingScopeHandler               RefreshingScopeHandler
+	ResponseErrorHandler                 ResponseErrorHandler
+	InternalErrorHandler                 InternalErrorHandler
+	ExtensionFieldsHandler               ExtensionFieldsHandler
+	AccessTokenExpHandler                AccessTokenExpHandler
+	AuthorizeScopeHandler                AuthorizeScopeHandler
+	ResponseTokenHandler                 ResponseTokenHandler
+	AccessTokenErrorResponseTokenHandler AccessTokenErrorResponseTokenHandler
 }
 
 func (s *Server) handleError(w http.ResponseWriter, req *AuthorizeRequest, err error) error {
@@ -88,16 +89,44 @@ func (s *Server) redirect(w http.ResponseWriter, req *AuthorizeRequest, data map
 
 func (s *Server) tokenError(w http.ResponseWriter, err error) error {
 	data, statusCode, header := s.GetErrorData(err)
-	return s.token(w, data, header, statusCode)
+	return s.tokenErrorHand(w, data, header, statusCode)
+}
+
+func (s *Server) tokenErrorHand(w http.ResponseWriter, data map[string]interface{}, header http.Header, statusCode ...int) error {
+	headersConstMap := s.prepareConsHeaderMap()
+
+	if fn := s.AccessTokenErrorResponseTokenHandler; fn != nil {
+		return fn(w, data, header, headersConstMap, statusCode...)
+	}
+
+	return s.tokenDefaultWriter(w, data, header, headersConstMap, statusCode...)
 }
 
 func (s *Server) token(w http.ResponseWriter, data map[string]interface{}, header http.Header, statusCode ...int) error {
+	headersConstMap := s.prepareConsHeaderMap()
+
 	if fn := s.ResponseTokenHandler; fn != nil {
-		return fn(w, data, header, statusCode...)
+		return fn(w, data, header, headersConstMap, statusCode...)
 	}
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	w.Header().Set("Cache-Control", "no-store")
-	w.Header().Set("Pragma", "no-cache")
+
+	return s.tokenDefaultWriter(w, data, header, headersConstMap, statusCode...)
+}
+
+func (s *Server) prepareConsHeaderMap() map[string]string {
+
+	headersConstMap := make(map[string]string)
+	headersConstMap["Content-Type"] = "application/json;charset=UTF-8"
+	headersConstMap["Cache-Control"] = "no-store"
+	headersConstMap["Pragma"] = "no-cache"
+
+	return headersConstMap
+}
+
+func (s *Server) tokenDefaultWriter(w http.ResponseWriter, data map[string]interface{}, header http.Header, headersConstMap map[string]string, statusCode ...int) error {
+
+	for k, v := range headersConstMap {
+		w.Header().Set(k, v)
+	}
 
 	for key := range header {
 		w.Header().Set(key, header.Get(key))
