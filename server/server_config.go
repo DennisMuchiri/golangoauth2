@@ -93,3 +93,8 @@ func (s *Server) SetAuthorizeScopeHandler(handler AuthorizeScopeHandler) {
 func (s *Server) SetResponseTokenHandler(handler ResponseTokenHandler) {
 	s.ResponseTokenHandler = handler
 }
+
+// SetAccessTokenErrorResponseTokenHandler token error response handling
+func (s *Server) SetAccessTokenErrorResponseTokenHandler(handler AccessTokenErrorResponseTokenHandler) {
+	s.AccessTokenErrorResponseTokenHandler = handler
+}

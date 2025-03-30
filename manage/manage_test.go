@@ -58,7 +58,8 @@ func TestManager(t *testing.T) {
 
 func testManager(tgr *oauth2.TokenGenerateRequest, manager oauth2.Manager) {
 	ctx := context.Background()
-	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr)
+	grantType := oauth2.AuthorizationCode
+	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr, &grantType)
 	So(err, ShouldBeNil)
 
 	code := cti.GetCode()
@@ -97,7 +98,8 @@ func testManager(tgr *oauth2.TokenGenerateRequest, manager oauth2.Manager) {
 		Refresh: refreshToken,
 		Scope:   "owner",
 	}
-	rti, err := manager.RefreshAccessToken(ctx, refreshParams)
+	grantTypeRefreshing := oauth2.Refreshing
+	rti, err := manager.RefreshAccessToken(ctx, refreshParams, &grantTypeRefreshing)
 	So(err, ShouldBeNil)
 
 	refreshAT := rti.GetAccess()
@@ -133,7 +135,8 @@ func testZeroAccessExpirationManager(tgr *oauth2.TokenGenerateRequest, manager o
 	So(ok, ShouldBeTrue)
 	m.SetAuthorizeCodeTokenCfg(&config)
 
-	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr)
+	grantTypeRefreshing := oauth2.AuthorizationCode
+	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr, &grantTypeRefreshing)
 	So(err, ShouldBeNil)
 
 	code := cti.GetCode()
@@ -168,7 +171,8 @@ func testCannotRequestZeroExpirationAccessTokens(tgr *oauth2.TokenGenerateReques
 	So(ok, ShouldBeTrue)
 	m.SetAuthorizeCodeTokenCfg(&config)
 
-	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr)
+	grantType := oauth2.AuthorizationCode
+	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr, &grantType)
 	So(err, ShouldBeNil)
 
 	code := cti.GetCode()
@@ -199,7 +203,8 @@ func testZeroRefreshExpirationManager(tgr *oauth2.TokenGenerateRequest, manager 
 	So(ok, ShouldBeTrue)
 	m.SetAuthorizeCodeTokenCfg(&config)
 
-	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr)
+	grantType := oauth2.AuthorizationCode
+	cti, err := manager.GenerateAuthToken(ctx, oauth2.Code, tgr, &grantType)
 	So(err, ShouldBeNil)
 
 	code := cti.GetCode()

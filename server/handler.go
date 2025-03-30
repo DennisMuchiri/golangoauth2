@@ -50,7 +50,10 @@ type (
 	ExtensionFieldsHandler func(ti oauth2.TokenInfo) (fieldsValue map[string]interface{})
 
 	// ResponseTokenHandler response token handing
-	ResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, statusCode ...int) error
+	ResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, constHeaders map[string]string, statusCode ...int) error
+
+	// AccessTokenErrorResponseTokenHandler response token handing
+	AccessTokenErrorResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, constHeaders map[string]string, statusCode ...int) error
 )
 
 // ClientFormHandler get client data from form

@@ -23,7 +23,8 @@ func TestAccess(t *testing.T) {
 			CreateAt: time.Now(),
 		}
 		gen := generates.NewAccessGenerate()
-		access, refresh, err := gen.Token(context.Background(), data, true)
+		grantType := oauth2.AuthorizationCode
+		access, refresh, err, _ := gen.Token(context.Background(), data, true, &grantType)
 		So(err, ShouldBeNil)
 		So(access, ShouldNotBeEmpty)
 		So(refresh, ShouldNotBeEmpty)

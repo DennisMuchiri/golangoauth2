@@ -33,7 +33,9 @@
 ```bash
 go get -u -v github.com/DennisMuchiri/ke-soundstream-oauth2/...
 ```
-
+```bash
+https://github.com/go-oauth2/oauth2
+```
 ### Create file `server.go`
 
 ```go
