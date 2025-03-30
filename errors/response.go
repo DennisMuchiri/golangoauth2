@@ -47,6 +47,8 @@ var (
 	ErrCodeChallengeRquired           = errors.New("invalid_request")
 	ErrUnsupportedCodeChallengeMethod = errors.New("invalid_request")
 	ErrInvalidCodeChallengeLen        = errors.New("invalid_request")
+	ErrUserNotFound                   = errors.New("user_not_found")
+	ErrOpenAuthenticationException    = errors.New("open_authentication_exception")
 )
 
 // Descriptions error description
@@ -63,7 +65,9 @@ var Descriptions = map[error]string{
 	ErrUnsupportedGrantType:           "The authorization grant type is not supported by the authorization server",
 	ErrCodeChallengeRquired:           "PKCE is required. code_challenge is missing",
 	ErrUnsupportedCodeChallengeMethod: "Selected code_challenge_method not supported",
-	ErrInvalidCodeChallengeLen:        "Code challenge length must be between 43 and 128 charachters long",
+	ErrInvalidCodeChallengeLen:        "Code challenge length must be between 43 and 128 characters long",
+	ErrUserNotFound:                   "You have supplied invalid credentials. Please retry.",
+	ErrOpenAuthenticationException:    "Full authentication is required to access this resource. Please retry.",
 }
 
 // StatusCodes response error HTTP status code
@@ -81,4 +85,6 @@ var StatusCodes = map[error]int{
 	ErrCodeChallengeRquired:           400,
 	ErrUnsupportedCodeChallengeMethod: 400,
 	ErrInvalidCodeChallengeLen:        400,
+	ErrUserNotFound:                   401,
+	ErrOpenAuthenticationException:    401,
 }

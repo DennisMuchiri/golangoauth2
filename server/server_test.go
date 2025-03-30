@@ -7,13 +7,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gavv/httpexpect"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/errors"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/manage"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/server"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/store"
+	"github.com/gavv/httpexpect"
 )
 
 var (
@@ -260,7 +260,7 @@ func TestPasswordCredentials(t *testing.T) {
 
 	manager.MapClientStorage(clientStore("", false))
 	srv = server.NewDefaultServer(manager)
-	srv.SetPasswordAuthorizationHandler(func(ctx context.Context, clientID, username, password string) (userID string, err error) {
+	srv.SetPasswordAuthorizationHandler(func(ctx context.Context, clientID, username, password string) (userID string, err error, message string) {
 		if username == "admin" && password == "123456" {
 			userID = "000000"
 			return
