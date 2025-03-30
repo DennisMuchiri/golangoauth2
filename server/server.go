@@ -32,8 +32,8 @@ func NewServer(cfg *Config, manager oauth2.Manager) *Server {
 		return "", errors.ErrAccessDenied
 	}
 
-	srv.PasswordAuthorizationHandler = func(ctx context.Context, clientID, username, password string) (string, error) {
-		return "", errors.ErrAccessDenied
+	srv.PasswordAuthorizationHandler = func(ctx context.Context, clientID, username, password string) (string, error, string) {
+		return "", errors.ErrAccessDenied, errors.ErrAccessDenied.Error()
 	}
 	return srv
 }
@@ -72,7 +72,7 @@ func (s *Server) redirectError(w http.ResponseWriter, req *AuthorizeRequest, err
 		return err
 	}
 
-	data, _, _ := s.GetErrorData(err)
+	data, _, _ := s.GetErrorData(err, "")
 	return s.redirect(w, req, data)
 }
 
@@ -87,8 +87,8 @@ func (s *Server) redirect(w http.ResponseWriter, req *AuthorizeRequest, data map
 	return nil
 }
 
-func (s *Server) tokenError(w http.ResponseWriter, err error) error {
-	data, statusCode, header := s.GetErrorData(err)
+func (s *Server) tokenError(w http.ResponseWriter, err error, message string) error {
+	data, statusCode, header := s.GetErrorData(err, message)
 	return s.tokenErrorHand(w, data, header, statusCode)
 }
 
@@ -345,20 +345,20 @@ func (s *Server) HandleAuthorizeRequest(w http.ResponseWriter, r *http.Request) 
 }
 
 // ValidationTokenRequest the token request validation
-func (s *Server) ValidationTokenRequest(r *http.Request) (oauth2.GrantType, *oauth2.TokenGenerateRequest, error) {
+func (s *Server) ValidationTokenRequest(r *http.Request) (oauth2.GrantType, *oauth2.TokenGenerateRequest, error, string) {
 	if v := r.Method; !(v == "POST" ||
 		(s.Config.AllowGetAccessRequest && v == "GET")) {
-		return "", nil, errors.ErrInvalidRequest
+		return "", nil, errors.ErrInvalidRequest, ""
 	}
 
 	gt := oauth2.GrantType(r.FormValue("grant_type"))
 	if gt.String() == "" {
-		return "", nil, errors.ErrUnsupportedGrantType
+		return "", nil, errors.ErrUnsupportedGrantType, ""
 	}
 
 	clientID, clientSecret, err := s.ClientInfoHandler(r)
 	if err != nil {
-		return "", nil, err
+		return "", nil, err, ""
 	}
 
 	tgr := &oauth2.TokenGenerateRequest{
@@ -373,24 +373,24 @@ func (s *Server) ValidationTokenRequest(r *http.Request) (oauth2.GrantType, *oau
 		tgr.Code = r.FormValue("code")
 		if tgr.RedirectURI == "" ||
 			tgr.Code == "" {
-			return "", nil, errors.ErrInvalidRequest
+			return "", nil, errors.ErrInvalidRequest, ""
 		}
 		tgr.CodeVerifier = r.FormValue("code_verifier")
 		if s.Config.ForcePKCE && tgr.CodeVerifier == "" {
-			return "", nil, errors.ErrInvalidRequest
+			return "", nil, errors.ErrInvalidRequest, ""
 		}
 	case oauth2.PasswordCredentials:
 		tgr.Scope = r.FormValue("scope")
 		username, password := r.FormValue("username"), r.FormValue("password")
 		if username == "" || password == "" {
-			return "", nil, errors.ErrInvalidRequest
+			return "", nil, errors.ErrInvalidRequest, ""
 		}
 
-		userID, err := s.PasswordAuthorizationHandler(r.Context(), clientID, username, password)
+		userID, err, msg := s.PasswordAuthorizationHandler(r.Context(), clientID, username, password)
 		if err != nil {
-			return "", nil, err
+			return "", nil, err, msg
 		} else if userID == "" {
-			return "", nil, errors.ErrInvalidGrant
+			return "", nil, errors.ErrInvalidGrant, msg
 		}
 		tgr.UserID = userID
 	case oauth2.ClientCredentials:
@@ -399,10 +399,10 @@ func (s *Server) ValidationTokenRequest(r *http.Request) (oauth2.GrantType, *oau
 		tgr.Refresh = r.FormValue("refresh_token")
 		tgr.Scope = r.FormValue("scope")
 		if tgr.Refresh == "" {
-			return "", nil, errors.ErrInvalidRequest
+			return "", nil, errors.ErrInvalidRequest, ""
 		}
 	}
-	return gt, tgr, nil
+	return gt, tgr, nil, ""
 }
 
 // CheckGrantType check allows grant type
@@ -546,20 +546,20 @@ func (s *Server) GetTokenData(ti oauth2.TokenInfo) map[string]interface{} {
 func (s *Server) HandleTokenRequest(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
-	gt, tgr, err := s.ValidationTokenRequest(r)
+	gt, tgr, err, msg := s.ValidationTokenRequest(r)
 	if err != nil {
-		return s.tokenError(w, err)
+		return s.tokenError(w, err, msg)
 	}
 
 	ti, err := s.GetAccessToken(ctx, gt, tgr)
 	if err != nil {
-		return s.tokenError(w, err)
+		return s.tokenError(w, err, msg)
 	}
 	return s.token(w, s.GetTokenData(ti), nil)
 }
 
 // GetErrorData get error response data
-func (s *Server) GetErrorData(err error) (map[string]interface{}, int, http.Header) {
+func (s *Server) GetErrorData(err error, message string) (map[string]interface{}, int, http.Header) {
 	var re errors.Response
 	if v, ok := errors.Descriptions[err]; ok {
 		re.Error = err
@@ -573,9 +573,14 @@ func (s *Server) GetErrorData(err error) (map[string]interface{}, int, http.Head
 		}
 
 		if re.Error == nil {
-			re.Error = errors.ErrServerError
-			re.Description = errors.Descriptions[errors.ErrServerError]
-			re.StatusCode = errors.StatusCodes[errors.ErrServerError]
+			//re.Error = errors.ErrServerError
+			re.Error = errors.ErrOpenAuthenticationException
+			if strings.TrimSpace(message) != "" {
+				re.Description = message
+			} else {
+				re.Description = errors.Descriptions[errors.ErrOpenAuthenticationException]
+			}
+			re.StatusCode = errors.StatusCodes[errors.ErrOpenAuthenticationException]
 		}
 	}
 
