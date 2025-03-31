@@ -29,6 +29,11 @@ func (s *Server) SetClientInfoHandler(handler ClientInfoHandler) {
 	s.ClientInfoHandler = handler
 }
 
+// SetClientInfoValidator validate gotten client info e.g from client store
+func (s *Server) SetClientInfoValidator(handler ClientInfoValidator) {
+	s.ClientInfoValidator = handler
+}
+
 // SetClientAuthorizedHandler check the client allows to use this authorization grant type
 func (s *Server) SetClientAuthorizedHandler(handler ClientAuthorizedHandler) {
 	s.ClientAuthorizedHandler = handler
