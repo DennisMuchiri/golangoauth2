@@ -522,6 +522,10 @@ func (s *Server) GetTokenData(ti oauth2.TokenInfo) map[string]interface{} {
 		data["user_id"] = userId
 	}
 
+	if authType := ti.GetAuthType(); authType != "" {
+		data["auth_type"] = authType
+	}
+
 	if clientId := ti.GetClientID(); clientId != "" {
 		data["client_id"] = clientId
 	}

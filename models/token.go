@@ -29,6 +29,7 @@ type Token struct {
 	RefreshCreateAt     time.Time     `bson:"RefreshCreateAt"`
 	RefreshExpiresIn    time.Duration `bson:"RefreshExpiresIn"`
 	IdJTI               string        `bson:"IdJTI"`
+	AuthType            string        `bson:"authType"`
 }
 
 // New create to token model instance
@@ -54,6 +55,16 @@ func (t *Token) GetUserID() string {
 // SetUserID the user id
 func (t *Token) SetUserID(userID string) {
 	t.UserID = userID
+}
+
+// GetUserID the authentication type
+func (t *Token) GetAuthType() string {
+	return t.AuthType
+}
+
+// SetAuthType the authentication type
+func (t *Token) SetAuthType(authType string) {
+	t.AuthType = authType
 }
 
 // GetRedirectURI redirect URI

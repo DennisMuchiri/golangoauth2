@@ -217,7 +217,7 @@ func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType,
 			ti.SetRefreshExpiresIn(icfg.RefreshTokenExp)
 		}
 
-		tv, rv, err, jti := m.accessGenerate.Token(ctx, td, icfg.IsGenerateRefresh, gt)
+		tv, rv, err, jti, authType := m.accessGenerate.Token(ctx, td, icfg.IsGenerateRefresh, gt)
 		if err != nil {
 			return nil, err
 		}
@@ -225,6 +225,16 @@ func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType,
 
 		if rv != "" {
 			ti.SetRefresh(rv)
+		}
+
+		if authType != "" {
+			if authType == "client" {
+				ti.SetAuthType("ClientAuth")
+			} else if authType == "user" {
+				ti.SetAuthType("UserAuth")
+			} else {
+				ti.SetAuthType(authType)
+			}
 		}
 
 		if jti != "" {
@@ -339,6 +349,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 	ti.SetUserID(tgr.UserID)
 	ti.SetRedirectURI(tgr.RedirectURI)
 	ti.SetScope(tgr.Scope)
+	ti.SetAuthType(tgr.AuthType)
 
 	createAt := time.Now()
 	ti.SetAccessCreateAt(createAt)
@@ -360,8 +371,9 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 		CreateAt:  createAt,
 		TokenInfo: ti,
 		Request:   tgr.Request,
+		AuthType:  tgr.AuthType,
 	}
-	av, rv, err, jti := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh, &gt)
+	av, rv, err, jti, authType := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh, &gt)
 	if err != nil {
 		return nil, err
 	}
@@ -373,6 +385,16 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 
 	if jti != "" {
 		ti.SetIdJTI(jti)
+	}
+
+	if authType != "" {
+		if authType == "client" {
+			ti.SetAuthType("ClientAuth")
+		} else if authType == "user" {
+			ti.SetAuthType("UserAuth")
+		} else {
+			ti.SetAuthType(authType)
+		}
 	}
 
 	err = m.tokenStore.Create(ctx, ti)
@@ -402,6 +424,7 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 		CreateAt:  time.Now(),
 		TokenInfo: ti,
 		Request:   tgr.Request,
+		AuthType:  ti.GetAuthType(),
 	}
 
 	rcfg := DefaultRefreshTokenCfg
@@ -426,7 +449,7 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 		ti.SetScope(scope)
 	}
 
-	tv, rv, err, jti := m.accessGenerate.Token(ctx, td, rcfg.IsGenerateRefresh, gt)
+	tv, rv, err, jti, authType := m.accessGenerate.Token(ctx, td, rcfg.IsGenerateRefresh, gt)
 	if err != nil {
 		return nil, err
 	}
@@ -434,6 +457,16 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 	ti.SetAccess(tv)
 	if rv != "" {
 		ti.SetRefresh(rv)
+	}
+
+	if authType != "" {
+		if authType == "client" {
+			ti.SetAuthType("ClientAuth")
+		} else if authType == "user" {
+			ti.SetAuthType("UserAuth")
+		} else {
+			ti.SetAuthType(authType)
+		}
 	}
 
 	if jti != "" {
