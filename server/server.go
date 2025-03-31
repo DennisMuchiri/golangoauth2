@@ -43,6 +43,7 @@ type Server struct {
 	Config                               *Config
 	Manager                              oauth2.Manager
 	ClientInfoHandler                    ClientInfoHandler
+	ClientInfoValidator                  ClientInfoValidator
 	ClientAuthorizedHandler              ClientAuthorizedHandler
 	ClientScopeHandler                   ClientScopeHandler
 	UserAuthorizationHandler             UserAuthorizationHandler
@@ -359,6 +360,13 @@ func (s *Server) ValidationTokenRequest(r *http.Request) (oauth2.GrantType, *oau
 	clientID, clientSecret, err := s.ClientInfoHandler(r)
 	if err != nil {
 		return "", nil, err, ""
+	}
+
+	if fn := s.ClientInfoValidator; fn != nil {
+		_, _, clientValidatorError := fn(clientID, clientSecret)
+		if clientValidatorError != nil {
+			return "", nil, errors.ErrInvalidClient, clientValidatorError.Error()
+		}
 	}
 
 	tgr := &oauth2.TokenGenerateRequest{

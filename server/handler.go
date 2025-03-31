@@ -13,6 +13,9 @@ type (
 	// ClientInfoHandler get client info from request
 	ClientInfoHandler func(r *http.Request) (clientID, clientSecret string, err error)
 
+	// ClientInfoValidator validate thet this is a valid client e.g check client info from storage
+	ClientInfoValidator func(id string, secret string) (clientID string, clientSecret string, err error)
+
 	// ClientAuthorizedHandler check the client allows to use this authorization grant type
 	ClientAuthorizedHandler func(clientID string, grant oauth2.GrantType) (allowed bool, err error)
 
