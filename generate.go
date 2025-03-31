@@ -14,6 +14,7 @@ type (
 		CreateAt  time.Time
 		TokenInfo TokenInfo
 		Request   *http.Request
+		AuthType  string
 	}
 
 	// AuthorizeGenerate generate the authorization code interface
@@ -23,6 +24,6 @@ type (
 
 	// AccessGenerate generate the access and refresh tokens interface
 	AccessGenerate interface {
-		Token(ctx context.Context, data *GenerateBasic, isGenRefresh bool, gt *GrantType) (access, refresh string, err error, jti string)
+		Token(ctx context.Context, data *GenerateBasic, isGenRefresh bool, gt *GrantType) (access, refresh string, err error, jti string, authType string)
 	}
 )

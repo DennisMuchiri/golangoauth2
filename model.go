@@ -28,6 +28,8 @@ type (
 		SetClientID(string)
 		GetUserID() string
 		SetUserID(string)
+		GetAuthType() string
+		SetAuthType(string)
 		GetRedirectURI() string
 		SetRedirectURI(string)
 		GetScope() string
