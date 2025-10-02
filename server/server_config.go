@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/go-oauth2/oauth2/v4"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
 )
 
 // SetTokenType token type
@@ -27,6 +27,11 @@ func (s *Server) SetAllowedGrantType(types ...oauth2.GrantType) {
 // SetClientInfoHandler get client info from request
 func (s *Server) SetClientInfoHandler(handler ClientInfoHandler) {
 	s.ClientInfoHandler = handler
+}
+
+// SetClientInfoValidator validate gotten client info e.g from client store
+func (s *Server) SetClientInfoValidator(handler ClientInfoValidator) {
+	s.ClientInfoValidator = handler
 }
 
 // SetClientAuthorizedHandler check the client allows to use this authorization grant type
@@ -92,6 +97,11 @@ func (s *Server) SetAuthorizeScopeHandler(handler AuthorizeScopeHandler) {
 // SetResponseTokenHandler response token handing
 func (s *Server) SetResponseTokenHandler(handler ResponseTokenHandler) {
 	s.ResponseTokenHandler = handler
+}
+
+// SetAccessTokenErrorResponseTokenHandler token error response handling
+func (s *Server) SetAccessTokenErrorResponseTokenHandler(handler AccessTokenErrorResponseTokenHandler) {
+	s.AccessTokenErrorResponseTokenHandler = handler
 }
 
 // SetRefreshTokenResolveHandler refresh token resolver

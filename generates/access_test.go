@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/generates"
-	"github.com/go-oauth2/oauth2/v4/models"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/generates"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -23,7 +23,8 @@ func TestAccess(t *testing.T) {
 			CreateAt: time.Now(),
 		}
 		gen := generates.NewAccessGenerate()
-		access, refresh, err := gen.Token(context.Background(), data, true)
+		grantType := oauth2.AuthorizationCode
+		access, refresh, err, _, _ := gen.Token(context.Background(), data, true, &grantType)
 		So(err, ShouldBeNil)
 		So(access, ShouldNotBeEmpty)
 		So(refresh, ShouldNotBeEmpty)

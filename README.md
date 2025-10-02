@@ -1,6 +1,7 @@
 # Golang OAuth 2.0 Server
 
-> An open protocol to allow secure authorization in a simple and standard method from web, mobile and desktop applications.
+> An open protocol to allow secure authorization in a simple and standard method from web, mobile and desktop
+> applications.
 
 [![Build][build-status-image]][build-status-url] [![Codecov][codecov-image]][codecov-url] [![ReportCard][reportcard-image]][reportcard-url] [![GoDoc][godoc-image]][godoc-url] [![License][license-image]][license-url]
 
@@ -31,7 +32,11 @@
 ### Download and install
 
 ```bash
-go get -u -v github.com/go-oauth2/oauth2/v4/...
+go get -u -v github.com/DennisMuchiri/ke-soundstream-oauth2/...
+```
+
+```bash
+https://github.com/go-oauth2/oauth2
 ```
 
 ### Create file `server.go`
@@ -43,11 +48,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-oauth2/oauth2/v4/errors"
-	"github.com/go-oauth2/oauth2/v4/manage"
-	"github.com/go-oauth2/oauth2/v4/models"
-	"github.com/go-oauth2/oauth2/v4/server"
-	"github.com/go-oauth2/oauth2/v4/store"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/errors"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/manage"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/server"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/store"
 )
 
 func main() {
@@ -67,10 +72,6 @@ func main() {
 	srv := server.NewDefaultServer(manager)
 	srv.SetAllowGetAccessRequest(true)
 	srv.SetClientInfoHandler(server.ClientFormHandler)
-
-	srv.UserAuthorizationHandler = func(w http.ResponseWriter, r *http.Request) (userID string, err error) {
-		return "000000", nil
-	}
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
 		log.Println("Internal Error:", err.Error())
@@ -106,6 +107,7 @@ go build server.go
 ```
 
 ### Open in your web browser
+
 **Authorization Request**:
 [http://localhost:9096/authorize?client_id=000000&response_type=code](http://localhost:9096/authorize?client_id=000000&response_type=code)
 
@@ -142,27 +144,27 @@ Simulation examples of authorization code model, please check [example](/example
 ```go
 
 import (
-	"github.com/go-oauth2/oauth2/v4/generates"
-	"github.com/dgrijalva/jwt-go"
+"github.com/DennisMuchiri/ke-soundstream-oauth2/generates"
+"github.com/dgrijalva/jwt-go"
 )
 
 // ...
 manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("00000000"), jwt.SigningMethodHS512))
 
 // Parse and verify jwt access token
-token, err := jwt.ParseWithClaims(access, &generates.JWTAccessClaims{}, func(t *jwt.Token) (interface{}, error) {
-	if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("parse error")
-	}
-	return []byte("00000000"), nil
+token, err := jwt.ParseWithClaims(access, &generates.JWTAccessClaims{}, func (t *jwt.Token) (interface{}, error) {
+if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+return nil, fmt.Errorf("parse error")
+}
+return []byte("00000000"), nil
 })
 if err != nil {
-	// panic(err)
+// panic(err)
 }
 
 claims, ok := token.Claims.(*generates.JWTAccessClaims)
 if !ok || !token.Valid {
-	// panic("invalid token")
+// panic("invalid token")
 }
 ```
 
@@ -190,12 +192,21 @@ if !ok || !token.Valid {
 Copyright (c) 2016 Lyric
 
 [build-status-url]: https://travis-ci.org/go-oauth2/oauth2
+
 [build-status-image]: https://travis-ci.org/go-oauth2/oauth2.svg?branch=master
+
 [codecov-url]: https://codecov.io/gh/go-oauth2/oauth2
+
 [codecov-image]: https://codecov.io/gh/go-oauth2/oauth2/branch/master/graph/badge.svg
-[reportcard-url]: https://goreportcard.com/report/github.com/go-oauth2/oauth2/v4
-[reportcard-image]: https://goreportcard.com/badge/github.com/go-oauth2/oauth2/v4
-[godoc-url]: https://godoc.org/github.com/go-oauth2/oauth2/v4
-[godoc-image]: https://godoc.org/github.com/go-oauth2/oauth2/v4?status.svg
+
+[reportcard-url]: https://goreportcard.com/report/github.com/DennisMuchiri/ke-soundstream-oauth2
+
+[reportcard-image]: https://goreportcard.com/badge/github.com/DennisMuchiri/ke-soundstream-oauth2
+
+[godoc-url]: https://godoc.org/github.com/DennisMuchiri/ke-soundstream-oauth2
+
+[godoc-image]: https://godoc.org/github.com/DennisMuchiri/ke-soundstream-oauth2?status.svg
+
 [license-url]: http://opensource.org/licenses/MIT
+
 [license-image]: https://img.shields.io/npm/l/express.svg

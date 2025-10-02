@@ -13,14 +13,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4/generates"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/generates"
 
-	"github.com/go-oauth2/oauth2/v4/errors"
-	"github.com/go-oauth2/oauth2/v4/manage"
-	"github.com/go-oauth2/oauth2/v4/models"
-	"github.com/go-oauth2/oauth2/v4/server"
-	"github.com/go-oauth2/oauth2/v4/store"
-	"github.com/go-session/session/v3"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/errors"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/manage"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/server"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/store"
+	"github.com/go-session/session"
 )
 
 var (
@@ -64,7 +64,7 @@ func main() {
 
 	srv := server.NewServer(server.NewConfig(), manager)
 
-	srv.SetPasswordAuthorizationHandler(func(ctx context.Context, clientID, username, password string) (userID string, err error) {
+	srv.SetPasswordAuthorizationHandler(func(ctx context.Context, clientID, username, password string) (userID string, err error, message string) {
 		if username == "test" && password == "test" {
 			userID = "test"
 		} else {
@@ -120,6 +120,7 @@ func main() {
 
 		err := srv.HandleTokenRequest(w, r)
 		if err != nil {
+			fmt.Println("HandleTokenRequest err")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -174,6 +175,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		if r.Form == nil {
 			r.ParseForm()
 		}
+
 		store.Set("ReturnUri", r.Form)
 		store.Save()
 

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4/errors"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/errors"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

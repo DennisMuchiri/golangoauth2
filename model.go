@@ -13,6 +13,7 @@ type (
 		GetDomain() string
 		IsPublic() bool
 		GetUserID() string
+		GetRoleID() string
 	}
 
 	// ClientPasswordVerifier the password handler interface
@@ -28,6 +29,8 @@ type (
 		SetClientID(string)
 		GetUserID() string
 		SetUserID(string)
+		GetAuthType() string
+		SetAuthType(string)
 		GetRedirectURI() string
 		SetRedirectURI(string)
 		GetScope() string
@@ -57,8 +60,10 @@ type (
 		SetRefreshCreateAt(time.Time)
 		GetRefreshExpiresIn() time.Duration
 		SetRefreshExpiresIn(time.Duration)
-	}
 
+		GetIdJTI() string
+		SetIdJTI(string)
+	}
 	ExtendableTokenInfo interface {
 		TokenInfo
 		GetExtension() url.Values

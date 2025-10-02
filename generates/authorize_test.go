@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/generates"
-	"github.com/go-oauth2/oauth2/v4/models"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/generates"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -18,6 +18,7 @@ func TestAuthorize(t *testing.T) {
 			Client: &models.Client{
 				ID:     "123456",
 				Secret: "123456",
+				RoleID: "ADMIN",
 			},
 			UserID:   "000000",
 			CreateAt: time.Now(),

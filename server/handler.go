@@ -6,13 +6,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/errors"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/errors"
 )
 
 type (
 	// ClientInfoHandler get client info from request
 	ClientInfoHandler func(r *http.Request) (clientID, clientSecret string, err error)
+
+	// ClientInfoValidator validate that this is a valid client e.g check client info from storage
+	ClientInfoValidator func(id string, secret string) (clientID string, clientSecret string, err error)
 
 	// ClientAuthorizedHandler check the client allows to use this authorization grant type
 	ClientAuthorizedHandler func(clientID string, grant oauth2.GrantType) (allowed bool, err error)
@@ -24,7 +27,7 @@ type (
 	UserAuthorizationHandler func(w http.ResponseWriter, r *http.Request) (userID string, err error)
 
 	// PasswordAuthorizationHandler get user id from username and password
-	PasswordAuthorizationHandler func(ctx context.Context, clientID, username, password string) (userID string, err error)
+	PasswordAuthorizationHandler func(ctx context.Context, clientID, username, password string) (userID string, err error, message string)
 
 	// RefreshingScopeHandler check the scope of the refreshing token
 	RefreshingScopeHandler func(tgr *oauth2.TokenGenerateRequest, oldScope string) (allowed bool, err error)
@@ -51,7 +54,10 @@ type (
 	ExtensionFieldsHandler func(ti oauth2.TokenInfo) (fieldsValue map[string]interface{})
 
 	// ResponseTokenHandler response token handling
-	ResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, statusCode ...int) error
+	ResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, constHeaders map[string]string, statusCode ...int) error
+
+	// AccessTokenErrorResponseTokenHandler response token handling
+	AccessTokenErrorResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, constHeaders map[string]string, statusCode ...int) error
 
 	// Handler to fetch the refresh token from the request
 	RefreshTokenResolveHandler func(r *http.Request) (string, error)

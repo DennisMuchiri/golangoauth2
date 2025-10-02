@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/errors"
-	"github.com/go-oauth2/oauth2/v4/generates"
-	"github.com/go-oauth2/oauth2/v4/models"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/errors"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/generates"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
 )
 
 // NewDefaultManager create to default authorization management instance
@@ -147,8 +147,24 @@ func (m *Manager) GetClient(ctx context.Context, clientID string) (cli oauth2.Cl
 	return
 }
 
+// GetAllClients get all clients information
+func (m *Manager) GetAllClients(ctx context.Context) (map[string]oauth2.ClientInfo, error) {
+	clients, err := m.clientStore.GetAll(ctx)
+	return clients, err
+}
+
+func (m *Manager) ReplaceAllClients(clients map[string]oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	isReplaced, err := m.clientStore.ReplaceAll(clients, ctx)
+	return isReplaced, err
+}
+
+func (m *Manager) SetOneClient(key string, client oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	isReplaced, err := m.clientStore.SetOne(key, client, ctx)
+	return isReplaced, err
+}
+
 // GenerateAuthToken generate the authorization token(code)
-func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
+func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType, tgr *oauth2.TokenGenerateRequest, gt *oauth2.GrantType) (oauth2.TokenInfo, error) {
 	cli, err := m.GetClient(ctx, tgr.ClientID)
 	if err != nil {
 		return nil, err
@@ -211,7 +227,7 @@ func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType,
 			ti.SetRefreshExpiresIn(icfg.RefreshTokenExp)
 		}
 
-		tv, rv, err := m.accessGenerate.Token(ctx, td, icfg.IsGenerateRefresh)
+		tv, rv, err, jti, authType := m.accessGenerate.Token(ctx, td, icfg.IsGenerateRefresh, gt)
 		if err != nil {
 			return nil, err
 		}
@@ -219,6 +235,20 @@ func (m *Manager) GenerateAuthToken(ctx context.Context, rt oauth2.ResponseType,
 
 		if rv != "" {
 			ti.SetRefresh(rv)
+		}
+
+		if authType != "" {
+			if authType == "client" {
+				ti.SetAuthType("ClientAuth")
+			} else if authType == "user" {
+				ti.SetAuthType("UserAuth")
+			} else {
+				ti.SetAuthType(authType)
+			}
+		}
+
+		if jti != "" {
+			ti.SetIdJTI(jti)
 		}
 	}
 
@@ -339,6 +369,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 	ti.SetUserID(tgr.UserID)
 	ti.SetRedirectURI(tgr.RedirectURI)
 	ti.SetScope(tgr.Scope)
+	ti.SetAuthType(tgr.AuthType)
 
 	createAt := time.Now()
 	ti.SetAccessCreateAt(createAt)
@@ -361,9 +392,9 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 		CreateAt:  createAt,
 		TokenInfo: ti,
 		Request:   tgr.Request,
+		AuthType:  tgr.AuthType,
 	}
-
-	av, rv, err := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh)
+	av, rv, err, jti, authType := m.accessGenerate.Token(ctx, td, gcfg.IsGenerateRefresh, &gt)
 	if err != nil {
 		return nil, err
 	}
@@ -371,6 +402,20 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 
 	if rv != "" {
 		ti.SetRefresh(rv)
+	}
+
+	if jti != "" {
+		ti.SetIdJTI(jti)
+	}
+
+	if authType != "" {
+		if authType == "client" {
+			ti.SetAuthType("ClientAuth")
+		} else if authType == "user" {
+			ti.SetAuthType("UserAuth")
+		} else {
+			ti.SetAuthType(authType)
+		}
 	}
 
 	err = m.tokenStore.Create(ctx, ti)
@@ -382,7 +427,7 @@ func (m *Manager) GenerateAccessToken(ctx context.Context, gt oauth2.GrantType, 
 }
 
 // RefreshAccessToken refreshing an access token
-func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGenerateRequest) (oauth2.TokenInfo, error) {
+func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGenerateRequest, gt *oauth2.GrantType) (oauth2.TokenInfo, error) {
 	ti, err := m.LoadRefreshToken(ctx, tgr.Refresh)
 	if err != nil {
 		return nil, err
@@ -401,6 +446,7 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 		CreateAt:  time.Now(),
 		TokenInfo: ti,
 		Request:   tgr.Request,
+		AuthType:  ti.GetAuthType(),
 	}
 
 	rcfg := DefaultRefreshTokenCfg
@@ -425,7 +471,7 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 		ti.SetScope(scope)
 	}
 
-	tv, rv, err := m.accessGenerate.Token(ctx, td, rcfg.IsGenerateRefresh)
+	tv, rv, err, jti, authType := m.accessGenerate.Token(ctx, td, rcfg.IsGenerateRefresh, gt)
 	if err != nil {
 		return nil, err
 	}
@@ -433,6 +479,20 @@ func (m *Manager) RefreshAccessToken(ctx context.Context, tgr *oauth2.TokenGener
 	ti.SetAccess(tv)
 	if rv != "" {
 		ti.SetRefresh(rv)
+	}
+
+	if authType != "" {
+		if authType == "client" {
+			ti.SetAuthType("ClientAuth")
+		} else if authType == "user" {
+			ti.SetAuthType("UserAuth")
+		} else {
+			ti.SetAuthType(authType)
+		}
+	}
+
+	if jti != "" {
+		ti.SetIdJTI(jti)
 	}
 
 	if err := m.tokenStore.Create(ctx, ti); err != nil {

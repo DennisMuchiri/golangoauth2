@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/go-oauth2/oauth2/v4"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
 )
 
 // NewToken create to token model instance
@@ -29,6 +29,8 @@ type Token struct {
 	Refresh             string        `bson:"Refresh"`
 	RefreshCreateAt     time.Time     `bson:"RefreshCreateAt"`
 	RefreshExpiresIn    time.Duration `bson:"RefreshExpiresIn"`
+	IdJTI               string        `bson:"IdJTI"`
+	AuthType            string        `bson:"authType"`
 	Extension           url.Values    `bson:"Extension"`
 }
 
@@ -55,6 +57,16 @@ func (t *Token) GetUserID() string {
 // SetUserID the user id
 func (t *Token) SetUserID(userID string) {
 	t.UserID = userID
+}
+
+// GetUserID the authentication type
+func (t *Token) GetAuthType() string {
+	return t.AuthType
+}
+
+// SetAuthType the authentication type
+func (t *Token) SetAuthType(authType string) {
+	t.AuthType = authType
 }
 
 // GetRedirectURI redirect URI
@@ -185,6 +197,16 @@ func (t *Token) GetRefreshExpiresIn() time.Duration {
 // SetRefreshExpiresIn the lifetime in seconds of the refresh token
 func (t *Token) SetRefreshExpiresIn(exp time.Duration) {
 	t.RefreshExpiresIn = exp
+}
+
+// GetIdJTI access IdJTI
+func (t *Token) GetIdJTI() string {
+	return t.IdJTI
+}
+
+// SetIdJTI access IdJTI
+func (t *Token) SetIdJTI(IdJTI string) {
+	t.IdJTI = IdJTI
 }
 
 // GetExtension extension of token

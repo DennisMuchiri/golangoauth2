@@ -7,6 +7,15 @@ type (
 	ClientStore interface {
 		// according to the ID for the client information
 		GetByID(ctx context.Context, id string) (ClientInfo, error)
+
+		// get all current client information
+		GetAll(ctx context.Context) (map[string]ClientInfo, error)
+
+		// replace all current client information
+		ReplaceAll(clients map[string]ClientInfo, ctx context.Context) (bool, error)
+
+		// replace all current client information
+		SetOne(key string, client ClientInfo, ctx context.Context) (bool, error)
 	}
 
 	// TokenStore the token information storage interface

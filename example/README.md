@@ -31,7 +31,6 @@ $ ./client
 }
 ```
 
-
 ### Try access token
 
 Open the browser [http://localhost:9094/try](http://localhost:9094/try)

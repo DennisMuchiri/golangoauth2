@@ -20,6 +20,7 @@ type TokenGenerateRequest struct {
 	CodeVerifier        string
 	AccessTokenExp      time.Duration
 	Request             *http.Request
+	AuthType            string
 }
 
 // Manager authorization management interface
@@ -27,14 +28,23 @@ type Manager interface {
 	// get the client information
 	GetClient(ctx context.Context, clientID string) (cli ClientInfo, err error)
 
-	// generate the authorization token(code)
-	GenerateAuthToken(ctx context.Context, rt ResponseType, tgr *TokenGenerateRequest) (authToken TokenInfo, err error)
+	// get all clients information
+	GetAllClients(ctx context.Context) (map[string]ClientInfo, error)
+
+	// set one client information
+	SetOneClient(key string, client ClientInfo, ctx context.Context) (bool, error)
+
+	// replace all clients information
+	ReplaceAllClients(clients map[string]ClientInfo, ctx context.Context) (bool, error)
+
+	// generate the authorization token(code)8
+	GenerateAuthToken(ctx context.Context, rt ResponseType, tgr *TokenGenerateRequest, gt *GrantType) (authToken TokenInfo, err error)
 
 	// generate the access token
 	GenerateAccessToken(ctx context.Context, gt GrantType, tgr *TokenGenerateRequest) (accessToken TokenInfo, err error)
 
 	// refreshing an access token
-	RefreshAccessToken(ctx context.Context, tgr *TokenGenerateRequest) (accessToken TokenInfo, err error)
+	RefreshAccessToken(ctx context.Context, tgr *TokenGenerateRequest, gt *GrantType) (accessToken TokenInfo, err error)
 
 	// use the access token to delete the token information
 	RemoveAccessToken(ctx context.Context, access string) (err error)

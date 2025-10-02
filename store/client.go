@@ -5,7 +5,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/go-oauth2/oauth2/v4"
+	"github.com/DennisMuchiri/ke-soundstream-oauth2"
 )
 
 // NewClientStore create client store
@@ -30,6 +30,32 @@ func (cs *ClientStore) GetByID(ctx context.Context, id string) (oauth2.ClientInf
 		return c, nil
 	}
 	return nil, errors.New("not found")
+}
+
+// get all current clients information
+func (cs *ClientStore) GetAll(ctx context.Context) (map[string]oauth2.ClientInfo, error) {
+	cs.RLock()
+	defer cs.RUnlock()
+
+	c := cs.data
+	return c, nil
+}
+
+// get all current clients information
+func (cs *ClientStore) ReplaceAll(clients map[string]oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	cs.RLock()
+	defer cs.RUnlock()
+
+	cs.data = clients
+	return true, nil
+}
+
+func (cs *ClientStore) SetOne(key string, cli oauth2.ClientInfo, ctx context.Context) (bool, error) {
+	cs.Lock()
+	defer cs.Unlock()
+
+	cs.data[key] = cli
+	return true, nil
 }
 
 // Set set client information

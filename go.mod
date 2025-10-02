@@ -1,10 +1,10 @@
-module github.com/go-oauth2/oauth2/v4
+module github.com/DennisMuchiri/ke-soundstream-oauth2
 
-go 1.21
+go 1.24
 
 require (
 	github.com/gavv/httpexpect v2.0.0+incompatible
-	github.com/go-session/session/v3 v3.2.1
+	github.com/go-session/session v3.1.2+incompatible
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.1.1
 	github.com/smartystreets/goconvey v1.6.4
@@ -15,13 +15,12 @@ require (
 require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/bytedance/gopkg v0.0.0-20221122125632-68358b8ecec6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
@@ -32,8 +31,8 @@ require (
 	github.com/onsi/gomega v1.10.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/smartystreets/assertions v1.1.0 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d // indirect
+	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/tidwall/btree v0.0.0-20191029221954-400434d76274 // indirect
 	github.com/tidwall/gjson v1.12.1 // indirect
 	github.com/tidwall/grect v0.0.0-20161006141115-ba9a043346eb // indirect
