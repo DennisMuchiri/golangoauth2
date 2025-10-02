@@ -67,6 +67,8 @@ func main() {
 	srv.SetPasswordAuthorizationHandler(func(ctx context.Context, clientID, username, password string) (userID string, err error, message string) {
 		if username == "test" && password == "test" {
 			userID = "test"
+		} else {
+			err = errors.New("invalid username or password")
 		}
 		return
 	})
@@ -205,12 +207,18 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		store.Set("LoggedInUserID", r.Form.Get("username"))
-		store.Save()
 
-		w.Header().Set("Location", "/auth")
-		w.WriteHeader(http.StatusFound)
-		return
+		if r.Form.Get("username") == "test" && r.Form.Get("password") == "test" {
+			store.Set("LoggedInUserID", r.Form.Get("username"))
+			store.Save()
+
+			w.Header().Set("Location", "/auth")
+			w.WriteHeader(http.StatusFound)
+			return
+		} else {
+			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+			return
+		}
 	}
 	outputHTML(w, r, "static/login.html")
 }

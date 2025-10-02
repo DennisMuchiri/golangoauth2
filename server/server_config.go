@@ -103,3 +103,13 @@ func (s *Server) SetResponseTokenHandler(handler ResponseTokenHandler) {
 func (s *Server) SetAccessTokenErrorResponseTokenHandler(handler AccessTokenErrorResponseTokenHandler) {
 	s.AccessTokenErrorResponseTokenHandler = handler
 }
+
+// SetRefreshTokenResolveHandler refresh token resolver
+func (s *Server) SetRefreshTokenResolveHandler(handler RefreshTokenResolveHandler) {
+	s.RefreshTokenResolveHandler = handler
+}
+
+// SetAccessTokenResolveHandler access token resolver
+func (s *Server) SetAccessTokenResolveHandler(handler AccessTokenResolveHandler) {
+	s.AccessTokenResolveHandler = handler
+}

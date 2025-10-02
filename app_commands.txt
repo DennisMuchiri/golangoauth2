@@ -4,5 +4,5 @@ go get github.com/DennisMuchiri/ke-soundstream-oauth2@none
 go clean -i -n  github.com/DennisMuchiri/ke-soundstream-oauth2
 
 
-go instsll
+go install
 go build

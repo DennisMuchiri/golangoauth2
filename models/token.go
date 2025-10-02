@@ -1,6 +1,7 @@
 package models
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/DennisMuchiri/ke-soundstream-oauth2"
@@ -8,7 +9,7 @@ import (
 
 // NewToken create to token model instance
 func NewToken() *Token {
-	return &Token{}
+	return &Token{Extension: make(url.Values)}
 }
 
 // Token token model
@@ -30,6 +31,7 @@ type Token struct {
 	RefreshExpiresIn    time.Duration `bson:"RefreshExpiresIn"`
 	IdJTI               string        `bson:"IdJTI"`
 	AuthType            string        `bson:"authType"`
+	Extension           url.Values    `bson:"Extension"`
 }
 
 // New create to token model instance
@@ -205,4 +207,14 @@ func (t *Token) GetIdJTI() string {
 // SetIdJTI access IdJTI
 func (t *Token) SetIdJTI(IdJTI string) {
 	t.IdJTI = IdJTI
+}
+
+// GetExtension extension of token
+func (t *Token) GetExtension() url.Values {
+	return t.Extension
+}
+
+// SetExtension set extension of token
+func (t *Token) SetExtension(e url.Values) {
+	t.Extension = e
 }

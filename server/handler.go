@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/DennisMuchiri/ke-soundstream-oauth2"
@@ -13,7 +14,7 @@ type (
 	// ClientInfoHandler get client info from request
 	ClientInfoHandler func(r *http.Request) (clientID, clientSecret string, err error)
 
-	// ClientInfoValidator validate thet this is a valid client e.g check client info from storage
+	// ClientInfoValidator validate that this is a valid client e.g check client info from storage
 	ClientInfoValidator func(id string, secret string) (clientID string, clientSecret string, err error)
 
 	// ClientAuthorizedHandler check the client allows to use this authorization grant type
@@ -52,11 +53,17 @@ type (
 	// ExtensionFieldsHandler in response to the access token with the extension of the field
 	ExtensionFieldsHandler func(ti oauth2.TokenInfo) (fieldsValue map[string]interface{})
 
-	// ResponseTokenHandler response token handing
+	// ResponseTokenHandler response token handling
 	ResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, constHeaders map[string]string, statusCode ...int) error
 
-	// AccessTokenErrorResponseTokenHandler response token handing
+	// AccessTokenErrorResponseTokenHandler response token handling
 	AccessTokenErrorResponseTokenHandler func(w http.ResponseWriter, data map[string]interface{}, header http.Header, constHeaders map[string]string, statusCode ...int) error
+
+	// Handler to fetch the refresh token from the request
+	RefreshTokenResolveHandler func(r *http.Request) (string, error)
+
+	// Handler to fetch the access token from the request
+	AccessTokenResolveHandler func(r *http.Request) (string, bool)
 )
 
 // ClientFormHandler get client data from form
@@ -76,4 +83,45 @@ func ClientBasicHandler(r *http.Request) (string, string, error) {
 		return "", "", errors.ErrInvalidClient
 	}
 	return username, password, nil
+}
+
+func RefreshTokenFormResolveHandler(r *http.Request) (string, error) {
+	rt := r.FormValue("refresh_token")
+	if rt == "" {
+		return "", errors.ErrInvalidRequest
+	}
+
+	return rt, nil
+}
+
+func RefreshTokenCookieResolveHandler(r *http.Request) (string, error) {
+	c, err := r.Cookie("refresh_token")
+	if err != nil {
+		return "", errors.ErrInvalidRequest
+	}
+
+	return c.Value, nil
+}
+
+func AccessTokenDefaultResolveHandler(r *http.Request) (string, bool) {
+	token := ""
+	auth := r.Header.Get("Authorization")
+	prefix := "Bearer "
+
+	if auth != "" && strings.HasPrefix(auth, prefix) {
+		token = auth[len(prefix):]
+	} else {
+		token = r.FormValue("access_token")
+	}
+
+	return token, token != ""
+}
+
+func AccessTokenCookieResolveHandler(r *http.Request) (string, bool) {
+	c, err := r.Cookie("access_token")
+	if err != nil {
+		return "", false
+	}
+
+	return c.Value, true
 }

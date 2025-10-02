@@ -25,8 +25,10 @@ func NewServer(cfg *Config, manager oauth2.Manager) *Server {
 		Manager: manager,
 	}
 
-	// default handler
+	// default handlers
 	srv.ClientInfoHandler = ClientBasicHandler
+	srv.RefreshTokenResolveHandler = RefreshTokenFormResolveHandler
+	srv.AccessTokenResolveHandler = AccessTokenDefaultResolveHandler
 
 	srv.UserAuthorizationHandler = func(w http.ResponseWriter, r *http.Request) (string, error) {
 		return "", errors.ErrAccessDenied
@@ -58,6 +60,8 @@ type Server struct {
 	AuthorizeScopeHandler                AuthorizeScopeHandler
 	ResponseTokenHandler                 ResponseTokenHandler
 	AccessTokenErrorResponseTokenHandler AccessTokenErrorResponseTokenHandler
+	RefreshTokenResolveHandler           RefreshTokenResolveHandler
+	AccessTokenResolveHandler            AccessTokenResolveHandler
 }
 
 func (s *Server) handleError(w http.ResponseWriter, req *AuthorizeRequest, err error) error {
@@ -404,10 +408,10 @@ func (s *Server) ValidationTokenRequest(r *http.Request) (oauth2.GrantType, *oau
 	case oauth2.ClientCredentials:
 		tgr.Scope = r.FormValue("scope")
 	case oauth2.Refreshing:
-		tgr.Refresh = r.FormValue("refresh_token")
+		tgr.Refresh, err = s.RefreshTokenResolveHandler(r)
 		tgr.Scope = r.FormValue("scope")
-		if tgr.Refresh == "" {
-			return "", nil, errors.ErrInvalidRequest, ""
+		if err != nil {
+			return "", nil, err, ""
 		}
 	}
 	return gt, tgr, nil, ""
@@ -429,6 +433,7 @@ func (s *Server) GetAccessToken(ctx context.Context, gt oauth2.GrantType, tgr *o
 	if allowed := s.CheckGrantType(gt); !allowed {
 		return nil, errors.ErrUnauthorizedClient
 	}
+
 	if fn := s.ClientAuthorizedHandler; fn != nil {
 		allowed, err := fn(tgr.ClientID, gt)
 		if err != nil {
@@ -567,6 +572,7 @@ func (s *Server) HandleTokenRequest(w http.ResponseWriter, r *http.Request) erro
 	if err != nil {
 		return s.tokenError(w, err, msg)
 	}
+
 	return s.token(w, s.GetTokenData(ti), nil)
 }
 
@@ -645,7 +651,7 @@ func (s *Server) BearerAuth(r *http.Request) (string, bool) {
 func (s *Server) ValidationBearerToken(r *http.Request) (oauth2.TokenInfo, error) {
 	ctx := r.Context()
 
-	accessToken, ok := s.BearerAuth(r)
+	accessToken, ok := s.AccessTokenResolveHandler(r)
 	if !ok {
 		return nil, errors.ErrInvalidAccessToken
 	}

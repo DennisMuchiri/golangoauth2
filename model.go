@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"net/url"
 	"time"
 )
 
@@ -62,5 +63,10 @@ type (
 
 		GetIdJTI() string
 		SetIdJTI(string)
+	}
+	ExtendableTokenInfo interface {
+		TokenInfo
+		GetExtension() url.Values
+		SetExtension(url.Values)
 	}
 )

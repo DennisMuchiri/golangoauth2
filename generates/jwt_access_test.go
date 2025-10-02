@@ -9,7 +9,7 @@ import (
 	"github.com/DennisMuchiri/ke-soundstream-oauth2"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/generates"
 	"github.com/DennisMuchiri/ke-soundstream-oauth2/models"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -45,7 +45,10 @@ func TestJWTAccess(t *testing.T) {
 		claims, ok := token.Claims.(*generates.JWTAccessClaims)
 		So(ok, ShouldBeTrue)
 		So(token.Valid, ShouldBeTrue)
-		So(claims.Audience, ShouldEqual, "123456")
+		aud, err := claims.GetAudience()
+		So(err, ShouldBeNil)
+		So(len(aud), ShouldEqual, 1)
+		So(aud[0], ShouldEqual, "123456")
 		So(claims.Subject, ShouldEqual, "000000")
 	})
 }

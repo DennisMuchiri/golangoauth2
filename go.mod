@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-session/session v3.1.2+incompatible
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.1.1
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/tidwall/buntdb v1.1.2
